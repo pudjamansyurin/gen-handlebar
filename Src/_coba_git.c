@@ -5,5 +5,6 @@
  *      Author: Puja
  */
 
-#define VERSI 1
+#define VER 0
+#define VERSI 2
 #define SUBVERSI 1
