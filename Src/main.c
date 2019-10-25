@@ -66,9 +66,9 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_CAN_Init(void);
-void StartCanRxTask(void const * argument);
-void StartThrottleTask(void const * argument);
-void CallbackTimer500(void const * argument);
+void StartCanRxTask(void const *argument);
+void StartThrottleTask(void const *argument);
+void CallbackTimer500(void const *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -295,8 +295,7 @@ static void MX_CAN_Init(void) {
 static void MX_DMA_Init(void) {
 
 	/* DMA controller clock enable */
-	__HAL_RCC_DMA1_CLK_ENABLE()
-	;
+	__HAL_RCC_DMA1_CLK_ENABLE();
 
 	/* DMA interrupt init */
 	/* DMA1_Channel1_IRQn interrupt configuration */
@@ -314,14 +313,10 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
 	/* GPIO Ports Clock Enable */
-	__HAL_RCC_GPIOC_CLK_ENABLE()
-	;
-	__HAL_RCC_GPIOD_CLK_ENABLE()
-	;
-	__HAL_RCC_GPIOB_CLK_ENABLE()
-	;
-	__HAL_RCC_GPIOA_CLK_ENABLE()
-	;
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(BSP_LED_GPIO_Port, BSP_LED_Pin, GPIO_PIN_RESET);
@@ -332,6 +327,16 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(BSP_LED_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : SUPPLY_IRQ_Pin */
+	GPIO_InitStruct.Pin = SUPPLY_IRQ_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(SUPPLY_IRQ_GPIO_Port, &GPIO_InitStruct);
+
+	/* EXTI interrupt init*/
+	HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
+	HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
@@ -345,10 +350,9 @@ static void MX_GPIO_Init(void) {
  * @retval None
  */
 /* USER CODE END Header_StartCanRxTask */
-void StartCanRxTask(void const * argument) {
-
+void StartCanRxTask(void const *argument) {
 	/* USER CODE BEGIN 5 */
-	CAN_Rx * RxCan;
+	CAN_Rx *RxCan;
 	osEvent evt;
 	uint8_t i;
 	/* Infinite loop */
@@ -379,23 +383,23 @@ void StartCanRxTask(void const * argument) {
  * @retval None
  */
 /* USER CODE END Header_StartThrottleTask */
-void StartThrottleTask(void const * argument) {
+void StartThrottleTask(void const *argument) {
 	/* USER CODE BEGIN StartThrottleTask */
-	extern uint16_t MCU_RPM;
+//	extern uint16_t MCU_RPM;
 	// Initialization of DMA ADC for Throttle
 	Throttle_DMA_Init();
 	/* Infinite loop */
 	for (;;) {
-		SWV_SendStr("MCU RPM : ");
-		SWV_SendInt(MCU_RPM);
-		SWV_SendStr("\n");
+//		SWV_SendStr("MCU RPM : ");
+//		SWV_SendInt(MCU_RPM);
+//		SWV_SendStr("\n");
 		osDelay(50);
 	}
 	/* USER CODE END StartThrottleTask */
 }
 
 /* CallbackTimer500 function */
-void CallbackTimer500(void const * argument) {
+void CallbackTimer500(void const *argument) {
 	/* USER CODE BEGIN CallbackTimer500 */
 	CANBUS_MCU_Dummy();
 	CANBUS_BMS_Dummy();
@@ -437,18 +441,18 @@ void Error_Handler(void) {
 
 #ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t *file, uint32_t line)
 {
-	/* USER CODE BEGIN 6 */
+  /* USER CODE BEGIN 6 */
 	/* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-	/* USER CODE END 6 */
+  /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
 

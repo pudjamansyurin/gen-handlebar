@@ -59,6 +59,9 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define BSP_LED_Pin GPIO_PIN_13
 #define BSP_LED_GPIO_Port GPIOC
+#define SUPPLY_IRQ_Pin GPIO_PIN_12
+#define SUPPLY_IRQ_GPIO_Port GPIOB
+#define SUPPLY_IRQ_EXTI_IRQn EXTI15_10_IRQn
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
