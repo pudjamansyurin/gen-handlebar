@@ -57,7 +57,6 @@ osTimerId Timer500Handle;
 osMutexId SwvMutexHandle;
 osMutexId CanTxMutexHandle;
 /* USER CODE BEGIN PV */
-osMailQId canRxMailHandle;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -142,8 +141,6 @@ int main(void) {
 
 	/* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
-	osMailQDef(canRxMail, 10, CAN_Rx);
-	canRxMailHandle = osMailCreate(osMailQ(canRxMail), NULL);
 	/* USER CODE END RTOS_QUEUES */
 
 	/* Create the thread(s) */
@@ -352,25 +349,23 @@ static void MX_GPIO_Init(void) {
 /* USER CODE END Header_StartCanRxTask */
 void StartCanRxTask(void const *argument) {
 	/* USER CODE BEGIN 5 */
-	CAN_Rx *RxCan;
-	osEvent evt;
+	extern CAN_Rx RxCan;
 	uint8_t i;
+	uint32_t ulNotifiedValue;
 	/* Infinite loop */
 	for (;;) {
-		evt = osMailGet(canRxMailHandle, osWaitForever);
-		if (evt.status == osEventMail) {
-			RxCan = evt.value.p;
-
+		// check if has new can message
+		xTaskNotifyWait(0x00, ULONG_MAX, &ulNotifiedValue, portMAX_DELAY);
+		// proceed event
+		if ((ulNotifiedValue & EVENT_CAN_RX_IT)) {
 			// show this message
 			SWV_SendStr("ID: ");
-			SWV_SendHex32(RxCan->RxHeader.StdId);
+			SWV_SendHex32(RxCan.RxHeader.StdId);
 			SWV_SendStr(", Data: ");
-			for (i = 0; i < RxCan->RxHeader.DLC; i++) {
-				SWV_SendHex8(RxCan->RxData[i]);
+			for (i = 0; i < RxCan.RxHeader.DLC; i++) {
+				SWV_SendHex8(RxCan.RxData[i]);
 			}
 			SWV_SendStrLn("");
-
-			osMailFree(canRxMailHandle, RxCan);
 		}
 	}
 	/* USER CODE END 5 */

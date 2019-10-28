@@ -18,6 +18,9 @@
 #define ClearBitOf(var, x) 				(var &= ~(1 << x))
 #define ToggleBitOf(var, x) 			(var ^= 1 << x)
 
+// list event
+#define EVENT_CAN_RX_IT							SetBit(0)
+
 // Function prototype
 void BSP_Led_Write(uint8_t state);
 void BSP_Led_Toggle(void);
