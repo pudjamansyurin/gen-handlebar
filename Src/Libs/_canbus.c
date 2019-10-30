@@ -134,18 +134,18 @@ uint8_t CANBUS_ECU_Trip_Mode(void) {
 #if (CAN_NODE & CAN_NODE_MCU)
 uint8_t CANBUS_MCU_Dummy(void) {
 	CAN_Tx TxCan;
-	extern uint16_t MCU_RPM;
-	static uint8_t MCU_Temperature = 0;
+	extern uint16_t DB_MCU_RPM;
+	extern uint8_t DB_MCU_Temperature;
 
 	// set message
 	// RPM data
-	TxCan.TxData[0] = (MCU_RPM & 0x00FF);
-	TxCan.TxData[1] = (MCU_RPM & 0xFF00) >> 8;
+	TxCan.TxData[0] = (DB_MCU_RPM & 0x00FF);
+	TxCan.TxData[1] = (DB_MCU_RPM & 0xFF00) >> 8;
 	// Temperature data
-	TxCan.TxData[2] = MCU_Temperature;
+	TxCan.TxData[2] = DB_MCU_Temperature;
 
 	// dummy algorithm
-	MCU_Temperature++;
+	DB_MCU_Temperature++;
 
 	// set default header
 	CAN_Set_Tx_Header(&(TxCan.TxHeader), CAN_ADDR_MCU_DUMMY, 3);
