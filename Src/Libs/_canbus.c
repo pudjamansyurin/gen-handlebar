@@ -159,17 +159,17 @@ uint8_t CANBUS_MCU_Dummy(void) {
 #if (CAN_NODE & CAN_NODE_BMS)
 uint8_t CANBUS_BMS_Dummy(void) {
 	CAN_Tx TxCan;
-	static uint8_t BMS_SoC = 100;
-	static uint8_t BMS_Temperature = 0;
+	extern uint8_t DB_BMS_SoC;
+	extern uint8_t DB_BMS_Temperature;
 
 	// set message
 	// SoC data
-	TxCan.TxData[0] = BMS_SoC;
+	TxCan.TxData[0] = DB_BMS_SoC;
 	// Temperature data
-	TxCan.TxData[1] = BMS_Temperature++;
+	TxCan.TxData[1] = DB_BMS_Temperature++;
 
 	// dummy algorithm
-	BMS_SoC = (!BMS_SoC ? 100 : (BMS_SoC - 1));
+	DB_BMS_SoC = (!DB_BMS_SoC ? 100 : (DB_BMS_SoC - 1));
 
 	// set default header
 	CAN_Set_Tx_Header(&(TxCan.TxHeader), CAN_ADDR_BMS_DUMMY, 2);
