@@ -5,7 +5,7 @@
  *      Author: Puja
  */
 
-#include "_DMA_Throttle.h"
+#include <Drivers/_DMA_Throttle.h>
 
 extern ADC_HandleTypeDef hadc1;
 uint16_t THROTTLE_ADC_DMA_Buffer[THROTTLE_BUFFER_SIZE];

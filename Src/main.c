@@ -19,15 +19,15 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include <Drivers/_DMA_Throttle.h>
+#include <Libs/_canbus.h>
+#include <Libs/_config.h>
 #include "main.h"
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "limits.h"
-#include "_config.h"
-#include "_DMA_Throttle.h"
-#include "_canbus.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

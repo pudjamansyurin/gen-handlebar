@@ -5,7 +5,7 @@
  *      Author: Puja
  */
 
-#include "_swv.h"
+#include <Drivers/_swv.h>
 
 extern osMutexId SwvMutexHandle;
 

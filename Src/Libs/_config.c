@@ -5,7 +5,7 @@
  *      Author: Puja
  */
 
-#include "_config.h"
+#include <Libs/_config.h>
 
 void BSP_Led_Write(uint8_t state) {
 	HAL_GPIO_WritePin(BSP_LED_GPIO_Port, BSP_LED_Pin, state);
