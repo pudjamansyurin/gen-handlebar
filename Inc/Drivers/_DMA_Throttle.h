@@ -11,9 +11,9 @@
 #include "stm32f1xx_hal.h"
 #include <string.h>
 #include <stdint.h>
+#include "_canbus.h"
 
-#define THROTTLE_BUFFER_SIZE 		100
-#define MCU_RPM_MAX				 			10000
+#define THROTTLE_BUFFER_SIZE 				100
 
 void Throttle_DMA_Init(void);
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc);

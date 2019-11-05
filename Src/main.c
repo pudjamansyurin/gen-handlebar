@@ -54,7 +54,7 @@ CAN_HandleTypeDef hcan;
 
 osThreadId canRxTaskHandle;
 osThreadId throttleTaskHandle;
-osTimerId Timer500Handle;
+osTimerId TimerCANHandle;
 osMutexId SwvMutexHandle;
 osMutexId CanTxMutexHandle;
 /* USER CODE BEGIN PV */
@@ -68,7 +68,7 @@ static void MX_ADC1_Init(void);
 static void MX_CAN_Init(void);
 void StartCanRxTask(void const *argument);
 void StartThrottleTask(void const *argument);
-void CallbackTimer500(void const *argument);
+void CallbackTimerCAN(void const *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -131,13 +131,13 @@ int main(void) {
 	/* USER CODE END RTOS_SEMAPHORES */
 
 	/* Create the timer(s) */
-	/* definition and creation of Timer500 */
-	osTimerDef(Timer500, CallbackTimer500);
-	Timer500Handle = osTimerCreate(osTimer(Timer500), osTimerPeriodic, NULL);
+	/* definition and creation of TimerCAN */
+	osTimerDef(TimerCAN, CallbackTimerCAN);
+	TimerCANHandle = osTimerCreate(osTimer(TimerCAN), osTimerPeriodic, NULL);
 
 	/* USER CODE BEGIN RTOS_TIMERS */
 	/* start timers, add new ones, ... */
-	osTimerStart(Timer500Handle, 500);
+	osTimerStart(TimerCANHandle, TIMER_CAN_VALUE);
 	/* USER CODE END RTOS_TIMERS */
 
 	/* USER CODE BEGIN RTOS_QUEUES */
@@ -394,14 +394,14 @@ void StartThrottleTask(void const *argument) {
 	/* USER CODE END StartThrottleTask */
 }
 
-/* CallbackTimer500 function */
-void CallbackTimer500(void const *argument) {
-	/* USER CODE BEGIN CallbackTimer500 */
+/* CallbackTimerCAN function */
+void CallbackTimerCAN(void const *argument) {
+	/* USER CODE BEGIN CallbackTimerCAN */
 	CANBUS_MCU_Dummy();
 	CANBUS_BMS_Dummy();
 
 	BSP_Led_Toggle();
-	/* USER CODE END CallbackTimer500 */
+	/* USER CODE END CallbackTimerCAN */
 }
 
 /**
