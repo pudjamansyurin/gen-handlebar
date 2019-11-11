@@ -13,9 +13,9 @@
 #include <stdint.h>
 #include "_canbus.h"
 
-#define THROTTLE_BUFFER_SIZE 				100
+#define THROTTLE_BUFFER_SIZE 				50
 
 void Throttle_DMA_Init(void);
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc);
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc);
 
 #endif /* DMA_ADC_H_ */

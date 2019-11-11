@@ -30,7 +30,7 @@
 
 // Others Parameters
 #define MCU_SPEED_MAX 												200
-#define MCU_RPM_MAX 												99999
+#define MCU_RPM_MAX 												119999
 #define ECU_ODOMETER_MAX											99999
 #define HMI_DRIVE_MODE_MAX											3
 

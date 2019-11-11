@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=/mnt/gen/GEN Drive/Source Code/HANDLEBAR/Inc
+HeaderPath=/home/puja/STM32CubeIDE/workspace_1.1.0/HANDLEBAR/Inc
 HeaderFiles=stm32f1xx_it.h;stm32f1xx_hal_conf.h;main.h;FreeRTOSConfig.h;
-SourcePath=/mnt/gen/GEN Drive/Source Code/HANDLEBAR/Src
+SourcePath=/home/puja/STM32CubeIDE/workspace_1.1.0/HANDLEBAR/Src
 SourceFiles=stm32f1xx_it.c;stm32f1xx_hal_msp.c;main.c;freertos.c;stm32f1xx_hal_timebase_tim.c;
 
 [PreviousLibFiles]
