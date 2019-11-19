@@ -80,7 +80,7 @@ uint8_t CANBUS_ECU_Select_Set(void) {
 	TxCan.TxData[0] |= DB_HMI_Switcher.mode << 4;
 
 	TxCan.TxData[1] = DB_HMI_Switcher.mode_sub_report[SWITCH_MODE_REPORT_RANGE];
-	TxCan.TxData[2] = DB_HMI_Switcher.mode_sub_report[SWITCH_MODE_REPORT_EFFICIENCY];
+	TxCan.TxData[2] = DB_HMI_Switcher.mode_sub_report[SWITCH_MODE_REPORT_AVERAGE];
 
 	// dummy algorithm
 	if (!DB_HMI_Switcher.mode_sub_report[SWITCH_MODE_REPORT_RANGE]) {
@@ -89,10 +89,10 @@ uint8_t CANBUS_ECU_Select_Set(void) {
 		DB_HMI_Switcher.mode_sub_report[SWITCH_MODE_REPORT_RANGE]--;
 	}
 
-	if (DB_HMI_Switcher.mode_sub_report[SWITCH_MODE_REPORT_EFFICIENCY] >= 255) {
-		DB_HMI_Switcher.mode_sub_report[SWITCH_MODE_REPORT_EFFICIENCY] = 0;
+	if (DB_HMI_Switcher.mode_sub_report[SWITCH_MODE_REPORT_AVERAGE] >= 255) {
+		DB_HMI_Switcher.mode_sub_report[SWITCH_MODE_REPORT_AVERAGE] = 0;
 	} else {
-		DB_HMI_Switcher.mode_sub_report[SWITCH_MODE_REPORT_EFFICIENCY]++;
+		DB_HMI_Switcher.mode_sub_report[SWITCH_MODE_REPORT_AVERAGE]++;
 	}
 
 	// set default header
