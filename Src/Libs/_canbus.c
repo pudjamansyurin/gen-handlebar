@@ -161,6 +161,8 @@ uint8_t CANBUS_MCU_Dummy(void) {
 #if (CAN_NODE & CAN_NODE_BMS)
 uint8_t CANBUS_BMS_Dummy(void) {
 	CAN_Tx TxCan;
+	const TickType_t tick100ms = pdMS_TO_TICKS(500);
+	static TickType_t tick;
 	extern uint8_t DB_BMS_SoC;
 	extern uint8_t DB_BMS_Temperature;
 
@@ -171,7 +173,10 @@ uint8_t CANBUS_BMS_Dummy(void) {
 	TxCan.TxData[1] = DB_BMS_Temperature++;
 
 	// dummy algorithm
-	DB_BMS_SoC = (!DB_BMS_SoC ? 100 : (DB_BMS_SoC - 1));
+	if ((osKernelSysTick() - tick) >= tick100ms) {
+		tick = osKernelSysTick();
+		DB_BMS_SoC = (!DB_BMS_SoC ? 100 : (DB_BMS_SoC - 1));
+	}
 
 	// set default header
 	CAN_Set_Tx_Header(&(TxCan.TxHeader), CAN_ADDR_BMS_DUMMY, 2);
