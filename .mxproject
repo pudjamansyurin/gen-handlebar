@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=/home/puja/STM32CubeIDE/workspace_1.1.0/HANDLEBAR/Inc
+HeaderPath=/home/pudja/STM32CubeIDE/workspace_1.1.0/HANDLEBAR/Inc
 HeaderFiles=stm32f1xx_it.h;stm32f1xx_hal_conf.h;main.h;FreeRTOSConfig.h;
-SourcePath=/home/puja/STM32CubeIDE/workspace_1.1.0/HANDLEBAR/Src
+SourcePath=/home/pudja/STM32CubeIDE/workspace_1.1.0/HANDLEBAR/Src
 SourceFiles=stm32f1xx_it.c;stm32f1xx_hal_msp.c;main.c;freertos.c;stm32f1xx_hal_timebase_tim.c;
 
 [PreviousLibFiles]
