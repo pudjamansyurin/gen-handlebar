@@ -57,7 +57,7 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define TIMER_CAN_MS 20
+#define TIMER_CAN_MS 10
 #define BSP_LED_Pin GPIO_PIN_13
 #define BSP_LED_GPIO_Port GPIOC
 #define SUPPLY_IRQ_Pin GPIO_PIN_12
