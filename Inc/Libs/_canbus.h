@@ -34,16 +34,6 @@
 #define ECU_ODOMETER_MAX											99999
 #define HMI_DRIVE_MODE_MAX											3
 
-// ==================================== ECU =========================================
-#if (CAN_NODE & CAN_NODE_ECU)
-#include "_rtc.h"
-#include "_database.h"
-
-uint8_t CANBUS_ECU_Switch(void);
-uint8_t CANBUS_ECU_RTC(void);
-uint8_t CANBUS_ECU_Select_Set(void);
-uint8_t CANBUS_ECU_Trip_Mode(void);
-#endif
 // ==================================== MCU =========================================
 #if (CAN_NODE & CAN_NODE_MCU)
 uint8_t CANBUS_MCU_Dummy(void);
