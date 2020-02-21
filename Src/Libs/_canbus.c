@@ -8,13 +8,15 @@
 #include <Libs/_canbus.h>
 
 CAN_Tx TxCan;
+const TickType_t tick100ms = pdMS_TO_TICKS(500);
+extern uint32_t DB_MCU_RPM;
+extern uint8_t DB_MCU_Temperature;
+extern uint8_t DB_BMS_SoC;
+extern uint8_t DB_BMS_Temperature;
 
 // ==================================== MCU =========================================
 #if (CAN_NODE & CAN_NODE_MCU)
 uint8_t CANBUS_MCU_Dummy(void) {
-	extern uint32_t DB_MCU_RPM;
-	extern uint8_t DB_MCU_Temperature;
-
 	// set message
 	// RPM data
 	TxCan.TxData[0] = (DB_MCU_RPM >> 0) & 0xFF;
@@ -38,10 +40,7 @@ uint8_t CANBUS_MCU_Dummy(void) {
 // ==================================== BMS =========================================
 #if (CAN_NODE & CAN_NODE_BMS)
 uint8_t CANBUS_BMS_Dummy(void) {
-	const TickType_t tick100ms = pdMS_TO_TICKS(500);
 	static TickType_t tick;
-	extern uint8_t DB_BMS_SoC;
-	extern uint8_t DB_BMS_Temperature;
 
 	// set message
 	// SoC data
