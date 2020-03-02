@@ -1,4 +1,6 @@
-# Progress:
+# HANDLEBAR / DUMMY GENERATOR
+
+## Progress:
 - [x] Add IWDG to Handlebar 
 - [x] Use external interrupt (rising/falling) rather then pooling to check the GPIO state every time (wasting CPU time) 
 - [x] [Do not use same line for EXTI](https://electronics.stackexchange.com/questions/267286/external-interrupts-in-stm32f10x/269899#269899)
