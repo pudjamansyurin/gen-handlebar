@@ -7,7 +7,7 @@
 
 #include <Drivers/_can.h>
 
-extern osThreadId canRxTaskHandle;
+extern osThreadId CanRxTaskHandle;
 extern osMutexId CanTxMutexHandle;
 extern CAN_HandleTypeDef hcan;
 CAN_HandleTypeDef *CanHandle = &hcan;
@@ -117,7 +117,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 	if (CAN_Read(&RxCan)) {
 		// signal only when RTOS started
 		if (osKernelRunning()) {
-			xTaskNotifyFromISR(canRxTaskHandle, EVENT_CAN_RX_IT, eSetBits, &xHigherPriorityTaskWoken);
+			xTaskNotifyFromISR(CanRxTaskHandle, EVENT_CAN_RX_IT, eSetBits, &xHigherPriorityTaskWoken);
 		}
 	}
 

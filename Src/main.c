@@ -54,9 +54,8 @@ CAN_HandleTypeDef hcan;
 
 IWDG_HandleTypeDef hiwdg;
 
-osThreadId canRxTaskHandle;
-osThreadId throttleTaskHandle;
-osTimerId TimerCANHandle;
+osThreadId CanTxTaskHandle;
+osThreadId CanRxTaskHandle;
 osMutexId SwvMutexHandle;
 osMutexId CanTxMutexHandle;
 /* USER CODE BEGIN PV */
@@ -69,9 +68,8 @@ static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_CAN_Init(void);
 static void MX_IWDG_Init(void);
+void StartCanTxTask(void const *argument);
 void StartCanRxTask(void const *argument);
-void StartThrottleTask(void const *argument);
-void CallbackTimerCAN(void const *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -116,6 +114,7 @@ int main(void)
 	MX_IWDG_Init();
 	/* USER CODE BEGIN 2 */
 	CAN_Init();
+	Throttle_DMA_Init();
 	/* USER CODE END 2 */
 
 	/* Create the mutex(es) */
@@ -135,14 +134,8 @@ int main(void)
 	/* add semaphores, ... */
 	/* USER CODE END RTOS_SEMAPHORES */
 
-	/* Create the timer(s) */
-	/* definition and creation of TimerCAN */
-	osTimerDef(TimerCAN, CallbackTimerCAN);
-	TimerCANHandle = osTimerCreate(osTimer(TimerCAN), osTimerPeriodic, NULL);
-
 	/* USER CODE BEGIN RTOS_TIMERS */
 	/* start timers, add new ones, ... */
-	osTimerStart(TimerCANHandle, TIMER_CAN_MS);
 	/* USER CODE END RTOS_TIMERS */
 
 	/* USER CODE BEGIN RTOS_QUEUES */
@@ -150,13 +143,13 @@ int main(void)
 	/* USER CODE END RTOS_QUEUES */
 
 	/* Create the thread(s) */
-	/* definition and creation of canRxTask */
-	osThreadDef(canRxTask, StartCanRxTask, osPriorityNormal, 0, 128);
-	canRxTaskHandle = osThreadCreate(osThread(canRxTask), NULL);
+	/* definition and creation of CanTxTask */
+	osThreadDef(CanTxTask, StartCanTxTask, osPriorityRealtime, 0, 128);
+	CanTxTaskHandle = osThreadCreate(osThread(CanTxTask), NULL);
 
-	/* definition and creation of throttleTask */
-	osThreadDef(throttleTask, StartThrottleTask, osPriorityNormal, 0, 128);
-	throttleTaskHandle = osThreadCreate(osThread(throttleTask), NULL);
+	/* definition and creation of CanRxTask */
+	osThreadDef(CanRxTask, StartCanRxTask, osPriorityHigh, 0, 128);
+	CanRxTaskHandle = osThreadCreate(osThread(CanRxTask), NULL);
 
 	/* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
@@ -166,7 +159,6 @@ int main(void)
 	osKernelStart();
 
 	/* We should never get here as control is now taken by the scheduler */
-
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
@@ -359,8 +351,8 @@ static void MX_GPIO_Init(void)
 	/* GPIO Ports Clock Enable */
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOD_CLK_ENABLE();
-	__HAL_RCC_GPIOB_CLK_ENABLE();
 	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(BSP_LED_GPIO_Port, BSP_LED_Pin, GPIO_PIN_RESET);
@@ -371,6 +363,31 @@ static void MX_GPIO_Init(void)
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(BSP_LED_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : PC14 PC15 */
+	GPIO_InitStruct.Pin = GPIO_PIN_14 | GPIO_PIN_15;
+	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : PA0 PA1 PA2 PA3
+	 PA4 PA5 PA6 PA7
+	 PA8 PA9 PA10 PA15 */
+	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3
+			| GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7
+			| GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_15;
+	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : PB1 PB2 PB10 PB11
+	 PB13 PB14 PB15 PB4
+	 PB5 PB6 PB7 PB8
+	 PB9 */
+	GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_10 | GPIO_PIN_11
+			| GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15 | GPIO_PIN_4
+			| GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8
+			| GPIO_PIN_9;
+	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 	/*Configure GPIO pin : SUPPLY_IRQ_Pin */
 	GPIO_InitStruct.Pin = SUPPLY_IRQ_Pin;
@@ -392,71 +409,55 @@ void vApplicationIdleHook(void)
 }
 /* USER CODE END 4 */
 
+/* USER CODE BEGIN Header_StartCanTxTask */
+/**
+ * @brief Function implementing the CanTxTask thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_StartCanTxTask */
+void StartCanTxTask(void const *argument)
+{
+	/* USER CODE BEGIN 5 */
+	TickType_t xLastWakeTime;
+	const TickType_t tick10ms = pdMS_TO_TICKS(10);
+
+	/* Infinite loop */
+	xLastWakeTime = xTaskGetTickCount();
+	for (;;) {
+		CANBUS_MCU_Dummy();
+		CANBUS_BMS_Dummy();
+
+		BSP_Led_Toggle();
+
+		// Periodic interval
+		vTaskDelayUntil(&xLastWakeTime, tick10ms);
+	}
+	/* USER CODE END 5 */
+}
+
 /* USER CODE BEGIN Header_StartCanRxTask */
 /**
- * @brief Function implementing the canRxTask thread.
+ * @brief Function implementing the CanRxTask thread.
  * @param argument: Not used
  * @retval None
  */
 /* USER CODE END Header_StartCanRxTask */
 void StartCanRxTask(void const *argument)
 {
-	/* USER CODE BEGIN 5 */
-	extern CAN_Rx RxCan;
-	uint8_t i;
+	/* USER CODE BEGIN StartCanRxTask */
 	uint32_t ulNotifiedValue;
+
 	/* Infinite loop */
-	for (;;) {
-		// check if has new can message
+	for (;;) {		// check if has new can message
 		xTaskNotifyWait(0x00, ULONG_MAX, &ulNotifiedValue, portMAX_DELAY);
+
 		// proceed event
 		if ((ulNotifiedValue & EVENT_CAN_RX_IT)) {
-			// show this message
-			SWV_SendStr("ID: ");
-			SWV_SendHex32(RxCan.RxHeader.StdId);
-			SWV_SendStr(", Data: ");
-			for (i = 0; i < RxCan.RxHeader.DLC; i++) {
-				SWV_SendHex8(RxCan.RxData[i]);
-			}
-			SWV_SendStrLn("");
+
 		}
 	}
-	/* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_StartThrottleTask */
-/**
- * @brief Function implementing the throttleTask thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_StartThrottleTask */
-void StartThrottleTask(void const *argument)
-{
-	/* USER CODE BEGIN StartThrottleTask */
-	//	extern uint16_t MCU_RPM;
-	// Initialization of DMA ADC for Throttle
-	Throttle_DMA_Init();
-	/* Infinite loop */
-	for (;;) {
-		//		SWV_SendStr("MCU RPM : ");
-		//		SWV_SendInt(MCU_RPM);
-		//		SWV_SendStr("\n");
-		osDelay(50);
-	}
-	/* USER CODE END StartThrottleTask */
-}
-
-/* CallbackTimerCAN function */
-void CallbackTimerCAN(void const *argument)
-{
-	/* USER CODE BEGIN CallbackTimerCAN */
-	// FIXME: dont use timer, instead use thread with higher priority
-	CANBUS_MCU_Dummy();
-	CANBUS_BMS_Dummy();
-
-	BSP_Led_Toggle();
-	/* USER CODE END CallbackTimerCAN */
+	/* USER CODE END StartCanRxTask */
 }
 
 /**

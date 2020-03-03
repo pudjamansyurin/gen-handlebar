@@ -18,7 +18,7 @@
 #define ClearBitOf(var, x) 				(var &= ~(1 << x))
 #define ToggleBitOf(var, x) 			(var ^= 1 << x)
 
-// list event
+// Events list
 #define EVENT_CAN_RX_IT							SetBit(0)
 
 // Function prototype
